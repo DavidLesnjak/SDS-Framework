@@ -268,18 +268,22 @@ WORD       | 32-bit value (low byte first).
 
 Commands are sent from the embedded target to the Host computer running the SDSIO Server.
 
-ID  | Name                 | Description
-:--:|:---------------------|:------------------------
-1   | SDSIO_CMD_OPEN       | Open an SDS data file
-2   | SDSIO_CMD_CLOSE      | Close an SDS data file
-3   | SDSIO_CMD_WRITE      | Write to an SDS data file
-4   | SDSIO_CMD_READ       | Read from an SDS data file
-5   | SDSIO_CMD_PING       | Ping Server
-6   | SDSIO_CMD_CTRL_WRITE | Write control data to Host
-7   | SDSIO_CMD_CTRL_READ  | Read control data from Host
+ID  | Name            | Description
+:--:|:----------------|:------------------------
+1   | SDSIO_CMD_OPEN  | Open an SDS data file
+2   | SDSIO_CMD_CLOSE | Close an SDS data file
+3   | SDSIO_CMD_WRITE | Write to an SDS data file
+4   | SDSIO_CMD_READ  | Read from an SDS data file
+5   | SDSIO_CMD_FLAGS | Exchange flags with Host
+6   | SDSIO_CMD_INFO  | Send control information to Host
 
-Each **Command** starts with a **Header (4 Words = 16 bytes)** and **optional data** with variable length.
-Depending on the Command, the SDSIO Server replies with a **Response** that repeats the **Header** and delivers **additional data**.
+Each **Command** starts with a **Header (4 Words = 16 bytes)** followed by **optional data** of variable length.
+Depending on the Command, the SDSIO Server replies with a **Response** that includes a **Header** with the same ID
+as the Command and may contain **additional data**.
+
+!!! Note
+    - The SDSIO_CMD_FLAGS Response is not a reply to the SDSIO_CMD_FLAGS Command; rather, it is an asynchronous Response sent by the Host.
+
 
 **SDSIO_CMD_OPEN**
 
@@ -307,7 +311,7 @@ The Response with ID = **1** (SDSIO_CMD_OPEN) provides a `Handle` that is used t
 
 The Command with ID = **2** (SDSIO_CMD_CLOSE) closes an SDS data file on the Host computer.
 The `Handle` is the identifier obtained with **SDSIO_CMD_OPEN**.
-There is no Response from the SDSIO Server on this Command.
+There is no Response from the SDSIO Server to this Command.
 
 ```txt
 | WORD |  WORD  | WORD | WORD |
@@ -320,7 +324,7 @@ There is no Response from the SDSIO Server on this Command.
 The Command with ID = **3** (SDSIO_CMD_WRITE) writes data to an SDS data file on the Host computer.
 The `Handle` is the identifier obtained with **SDSIO_CMD_OPEN**.
 `Size` specifies the size of `Data` in bytes.
-There is no Response from the SDSIO Server for this Command.
+There is no Response from the SDSIO Server to this Command.
 
 ```txt
 | WORD |  WORD  | WORD | WORD |++++++|
@@ -349,53 +353,40 @@ The Response with ID = **4** (SDSIO_CMD_READ) provides the data read from an SDS
 |******|********|********|******|++++++|
 ```
 
-**SDSIO_CMD_PING**
+**SDSIO_CMD_FLAGS**
 
-The Command with ID = **5** (SDSIO_CMD_PING) verifies if the Server is active and reachable on the Host.
-
-```txt
-| WORD | WORD | WORD | WORD |
->  5   |  0   |  0   |  0   |
-|******|******|******|******|
-```
-
-The Response with ID = **5** (SDSIO_CMD_PING) returns the `Status` with nonzero = server active, else 0
+The Command with ID = **5** (SDSIO_CMD_FLAGS) sends flags information to the Host computer.
+`Flags` represents the flags value to be sent.
+There is no Response from the SDSIO Server to this Command.
 
 ```txt
-| WORD | WORD |  WORD  | WORD |
-<  5   |  0   | Status |  0   |
-|******|******|********|******|
+| WORD | WORD  | WORD | WORD |
+>  5   | Flags |  0   |  0   |
+|******|*******|******|******|
 ```
 
-**SDSIO_CMD_CTRL_WRITE**
+The asynchronous Response with ID = **5** (SDSIO_CMD_FLAGS) contains the flags update information from the Host computer.
+This Response can arrive at any time when the Host wants to update the flags value.
+It can also precede a Response to any other command (e.g., SDSIO_CMD_OPEN or SDSIO_CMD_READ), but it cannot be sent by the Host
+while a Response to another Command is in progress.
+`Flags Set` is a request to set flags.
+`Flags Clear` is a request to clear flags.
 
-The Command with ID = **6** (SDSIO_CMD_CTRL_WRITE) writes control data to a control buffer on the Host computer.
-`Size` specifies the size of `Data` in bytes.
-There is no Response from the SDSIO Server for this Command.
+```txt
+| WORD | WORD      | WORD        | WORD |
+<  5   | Flags Set | Flags Clear |  0   |
+|******|***********|*************|******|
+```
+
+**SDSIO_CMD_INFO**
+
+The Command with ID = **6** (SDSIO_CMD_INFO) sends control information (e.g., error information) to the Host computer.
+`Len` specifies the size of the `Data` that follows the header.
+There is no Response from the SDSIO Server to this Command.
 
 ```txt
 | WORD | WORD | WORD | WORD |++++++|
->  6   |  0   |  0   | Size | Data |
-|******|******|******|******|++++++|
-```
-
-**SDSIO_CMD_CTRL_READ**
-
-The Command with ID = **7** (SDSIO_CMD_CTRL_READ) reads control data from a control buffer on the Host computer.
-`Size` specifies the number of bytes to read.
-
-```txt
-| WORD | WORD | WORD | WORD |
->  7   |  0   | Size |  0   |
-|******|******|******|******|
-```
-
-The Response with ID = **7** (SDSIO_CMD_CTRL_READ) returns the data read from the control buffer on the Host computer.
-`Size` specifies the size of `Data` in bytes that was read.
-
-```txt
-| WORD | WORD | WORD | WORD |++++++|
->  7   |  0   |  0   | Size | Data |
+>  6   |  0   |  0   | Len  | Data |
 |******|******|******|******|++++++|
 ```
 

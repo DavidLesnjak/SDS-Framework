@@ -42,9 +42,8 @@ typedef struct {
 #define SDSIO_CMD_CLOSE         2U
 #define SDSIO_CMD_WRITE         3U
 #define SDSIO_CMD_READ          4U
-#define SDSIO_CMD_PING          5U
-#define SDSIO_CMD_CTRL_WRITE    6U
-#define SDSIO_CMD_CTRL_READ     7U
+#define SDSIO_CMD_FLAGS         5U
+#define SDSIO_CMD_INFO          6U
 
 // Function prototypes
 
@@ -83,6 +82,13 @@ int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size);
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
 int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
+
+/**
+  \fn          uint32_t sdsioClientReceiveGetCount (void)
+  \brief       Performs a non-blocking check of how many bytes were received from SDSIO-Server
+  \return      number of bytes received and pending
+*/
+uint32_t sdsioClientReceiveGetCount (void);
 
 #ifdef  __cplusplus
 }

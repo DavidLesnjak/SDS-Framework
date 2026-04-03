@@ -102,24 +102,31 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size);
 int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size);
 
 /**
-  \fn          int32_t sdsioControlWrite (const void *buf, uint32_t buf_size)
-  \brief       Write control data to Host.
-  \param[in]   buf            pointer to buffer with data to write
-  \param[in]   buf_size       buffer size in bytes
-  \return      number of bytes successfully written or
-               a negative value on error (see \ref SDS_IO_Return_Codes)
+  \fn          uint32_t sdsioFlagsGet (void)
+  \brief       Checks for flags update received from the Host,
+               updates the flags accordingly, and returns the updated value.
+  \return      current flags value
 */
-int32_t sdsioControlWrite (const void *buf, uint32_t buf_size);
+uint32_t sdsioFlagsGet (void);
 
 /**
-  \fn          int32_t sdsioControlRead (void *buf, uint32_t buf_size)
-  \brief       Read control data from Host.
-  \param[out]  buf            pointer to buffer for data to read
-  \param[in]   buf_size       buffer size in bytes
-  \return      number of bytes successfully read, or
+  \fn          int32_t sdsioFlagsSend (uint32_t flags)
+  \brief       Send flags value to the Host.
+  \param[out]  flags          flags value to be sent
+  \return      SDSIO_OK on success or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioControlRead (void *buf, uint32_t buf_size);
+int32_t sdsioFlagsSend (uint32_t flags);
+
+/**
+  \fn          int32_t sdsioInfoSend (void *info, uint32_t len)
+  \brief       Send control information to the Host.
+  \param[in]   info           pointer to control information to be sent
+  \param[in]   len            number of bytes to send
+  \return      number of bytes successfully sent or
+               a negative value on error (see \ref SDS_IO_Return_Codes)
+*/
+int32_t sdsioInfoSend (void *info, uint32_t len);
 
 #ifdef  __cplusplus
 }

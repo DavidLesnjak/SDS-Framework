@@ -142,24 +142,30 @@ int32_t sdsPlayRead (sdsRecPlayId_t id, uint32_t *timestamp, void *buf, uint32_t
 int32_t sdsPlayGetSize (sdsRecPlayId_t id);
 
 /**
-  \fn          int32_t sdsRecPlayControlWrite (const void *buf, uint32_t buf_size)
-  \brief       Write control data to Host.
-  \param[in]   buf            pointer to the control data buffer to be written
-  \param[in]   buf_size       size of the control data buffer in bytes
-  \return      number of bytes successfully written or
-               a negative value on error (see \ref SDS_Recorder_Player_Return_Codes)
+  \fn          uint32_t sdsFlagsGet (void)
+  \brief       Get the up-to-date value of flags.
+  \return      current flags value
 */
-int32_t sdsRecPlayControlWrite (const void *buf, uint32_t buf_size);
+uint32_t sdsFlagsGet (void);
 
 /**
-  \fn          int32_t sdsRecPlayControlRead (void *buf, uint32_t buf_size)
-  \brief       Read control data from Host.
-  \param[out]  buf            pointer to the control data buffer to be read
-  \param[in]   buf_size       size of the control data buffer in bytes
-  \return      number of bytes successfully read, or
+  \fn          int32_t sdsFlagsSend (uint32_t flags)
+  \brief       Send flags value to the Host.
+  \param[out]  flags          flags value to be sent
+  \return      SDS_REC_PLAY_OK on success or
                a negative value on error (see \ref SDS_Recorder_Player_Return_Codes)
 */
-int32_t sdsRecPlayControlRead (void *buf, uint32_t buf_size);
+int32_t sdsFlagsSend (uint32_t flags);
+
+/**
+  \fn          int32_t sdsInfoSend (void *info, uint32_t len)
+  \brief       Send control information to the Host.
+  \param[in]   info           pointer to control information to be sent
+  \param[in]   len            number of bytes to send
+  \return      number of bytes successfully sent or
+               a negative value on error (see \ref SDS_Recorder_Player_Return_Codes)
+*/
+int32_t sdsInfoSend (void *info, uint32_t len);
 
 #ifdef  __cplusplus
 }
