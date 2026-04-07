@@ -47,7 +47,7 @@ typedef enum {
 
 /**
   \fn          int32_t sdsioInit (void)
-  \brief       Initialize SDS I/O Interface.
+  \brief       Initialize SDS I/O interface.
   \return      SDSIO_OK on success or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
@@ -55,7 +55,7 @@ int32_t sdsioInit (void);
 
 /**
   \fn          int32_t sdsioUninit (void)
-  \brief       Un-initialize SDS I/O Interface.
+  \brief       Un-initialize SDS I/O interface.
   \return      SDSIO_OK on success or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
@@ -97,36 +97,31 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size);
   \param[out]  buf            pointer to buffer for data to read
   \param[in]   buf_size       buffer size in bytes
   \return      number of bytes successfully read, or
-               a negative value on error or EOS (see \ref SDS_IO_Return_Codes)
+               a negative value on error or SDSIO_EOS (see \ref SDS_IO_Return_Codes)
 */
 int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size);
 
 /**
-  \fn          uint32_t sdsioFlagsGet (void)
-  \brief       Checks for flags update received from the Host,
-               updates the flags accordingly, and returns the updated value.
-  \return      current flags value
-*/
-uint32_t sdsioFlagsGet (void);
-
-/**
-  \fn          int32_t sdsioFlagsSend (uint32_t flags)
-  \brief       Send flags value to the Host.
-  \param[out]  flags          flags value to be sent
+  \fn          int32_t sdsioFlagsGet (uint32_t *flags_set, uint32_t *flags_clr)
+  \brief       Checks for flags update received from the Host.
+  \param[out]  flags_set      pointer to a variable where the bitmask for set will be returned
+  \param[out]  flags_clr      pointer to a variable where the bitmask for clear will be returned
   \return      SDSIO_OK on success or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioFlagsSend (uint32_t flags);
+int32_t sdsioFlagsGet (uint32_t *flags_set, uint32_t *flags_clr);
 
 /**
-  \fn          int32_t sdsioInfoSend (void *info, uint32_t len)
-  \brief       Send control information to the Host.
-  \param[in]   info           pointer to control information to be sent
-  \param[in]   len            number of bytes to send
+  \fn          int32_t sdsioInfoSend (uint32_t flags, uint32_t word, void *info, uint32_t len)
+  \brief       Send additional information to the Host.
+  \param[in]   flags          32-bit flags value to be sent to the Host (in header)
+  \param[in]   word           32-bit value to be sent to the Host (in header)
+  \param[in]   info           pointer to additional information to be sent
+  \param[in]   len            number of bytes of additional information to send
   \return      number of bytes successfully sent or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioInfoSend (void *info, uint32_t len);
+int32_t sdsioInfoSend (uint32_t flags, uint32_t word, void *info, uint32_t len);
 
 #ifdef  __cplusplus
 }

@@ -35,15 +35,16 @@ typedef struct {
   uint32_t sdsio_id;
   uint32_t argument;
   uint32_t data_size;
-} header_t;
+} sdsio_header_t;
 
 // SDSIO Server Command IDs
 #define SDSIO_CMD_OPEN          1U
 #define SDSIO_CMD_CLOSE         2U
 #define SDSIO_CMD_WRITE         3U
 #define SDSIO_CMD_READ          4U
-#define SDSIO_CMD_FLAGS         5U
-#define SDSIO_CMD_INFO          6U
+#define SDSIO_CMD_PING          5U
+#define SDSIO_CMD_FLAGS         6U
+#define SDSIO_CMD_INFO          7U
 
 // Function prototypes
 
@@ -65,7 +66,7 @@ int32_t sdsioClientUninit (void);
 
 /**
   \fn          int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size)
-  \brief       Send data to SDSIO-Server.
+  \brief       Send data to SDSIO-Server (blocking).
   \param[in]   buf         pointer to buffer with data to send
   \param[in]   buf_size    buffer size in bytes
   \return      number of bytes successfully sent or
@@ -75,7 +76,7 @@ int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size);
 
 /**
   \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size)
-  \brief       Receive data from SDSIO-Server.
+  \brief       Receive data from SDSIO-Server (blocking).
   \param[out]  buf          pointer to buffer for data to read
   \param[in]   buf_size     buffer size in bytes
   \return      number of bytes successfully received or
@@ -85,7 +86,7 @@ int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
 
 /**
   \fn          uint32_t sdsioClientReceiveGetCount (void)
-  \brief       Performs a non-blocking check of how many bytes were received from SDSIO-Server
+  \brief       Performs a non-blocking check of how many bytes were received from SDSIO-Server.
   \return      number of bytes received and pending
 */
 uint32_t sdsioClientReceiveGetCount (void);
