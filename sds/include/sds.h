@@ -169,7 +169,8 @@ extern sdsError_t sdsError;
 #define SDS_FLAG_START     (1U << 31)   // sdsFlags.31 = 1 for start of the SDS recording/playback
 #define SDS_FLAG_TERMINATE (1U << 30)   // sdsFlags.30 = 1 for terminating CI run (on FVP simulation or pyOCD)
 #define SDS_FLAG_PLAYBACK  (1U << 29)   // sdsFlags.29 = 1 for playback mode
-                                        // sdsFlags.24..28 reserved for future enhancements
+#define SDS_FLAG_ALIVE     (1U << 28)   // sdsFlags.28 = 1 Host is alive
+                                        // sdsFlags.24..27 reserved for future enhancements
                                         // sdsFlags.0..23 for user options (i.e. bypassing filter, etc.)
 
 // Global configuration options and diagnostic storage information (flags)
@@ -188,23 +189,25 @@ extern volatile uint32_t sdsFlags;      // SDS control flags (see \ref SDS_Flags
 extern volatile uint32_t sdsState;      // SDS states (see \ref SDS_States)
 
 // Global idle rate information
-extern volatile uint32_t sdsIdleRate;
+extern volatile uint32_t idleRate;
 
 /**
-  \fn          void sdsExchange (void)
-  \brief       Exchange information with Host (sdsFlags, sdsIdleRate, error message)
-*/
-void sdsExchange (void);
-
-/**
-  \fn          int32_t sdsFlagsModify (uint32_t flags_set, uint32_t flags_clr)
-  \brief       Modify sdsFlags and send updated value to the Host.
-  \param[in]   flags_set      bitmask of flags to be set in sdsFlags
-  \param[in]   flags_clr      bitmask of flags to be cleared in sdsFlags
+  \fn          int32_t sdsExchange (void)
+  \brief       Exchange information with the Host.
+               Update sdsFlags if requested by the Host, and send current sdsFlags
+               value along with idleRate and optional error information (sdsError) to the Host.
   \return      SDS_OK on success or
                a negative value on error (see \ref SDS_Return_Codes)
 */
-int32_t sdsFlagsModify (uint32_t flags_set, uint32_t flags_clr);
+int32_t sdsExchange (void);
+
+/**
+  \fn          void sdsFlagsModify (uint32_t set_mask, uint32_t clear_mask)
+  \brief       Modify SDS control flags (atomic operation).
+  \param[in]   set_mask        bits to set in sdsFlags
+  \param[in]   clear_mask      bits to clear in sdsFlags
+*/
+void sdsFlagsModify (uint32_t set_mask, uint32_t clear_mask);
 
 #ifdef  __cplusplus
 }

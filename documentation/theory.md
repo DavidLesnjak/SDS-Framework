@@ -274,8 +274,9 @@ ID  | Name            | Description
 2   | SDSIO_CMD_CLOSE | Close an SDS data file
 3   | SDSIO_CMD_WRITE | Write to an SDS data file
 4   | SDSIO_CMD_READ  | Read from an SDS data file
-5   | SDSIO_CMD_FLAGS | Exchange flags with Host
-6   | SDSIO_CMD_INFO  | Send control information to Host
+5   | SDSIO_CMD_PING  | Ping Server
+6   | SDSIO_CMD_FLAGS | SDS control flags update request from Host
+7   | SDSIO_CMD_INFO  | Send control information to Host
 
 Each **Command** starts with a **Header (4 Words = 16 bytes)** followed by **optional data** of variable length.
 Depending on the Command, the SDSIO Server replies with a **Response** that includes a **Header** with the same ID
@@ -353,41 +354,52 @@ The Response with ID = **4** (SDSIO_CMD_READ) provides the data read from an SDS
 |******|********|********|******|++++++|
 ```
 
-**SDSIO_CMD_FLAGS**
+**SDSIO_CMD_PING**
 
-The Command with ID = **5** (SDSIO_CMD_FLAGS) sends flags information to the Host computer.
-`Flags` represents the flags value to be sent.
-There is no Response from the SDSIO Server to this Command.
+The Command with ID = **5** (SDSIO_CMD_PING) verifies if the Server is active and reachable on the Host.
 
 ```txt
-| WORD | WORD  | WORD | WORD |
->  5   | Flags |  0   |  0   |
-|******|*******|******|******|
+| WORD | WORD | WORD | WORD |
+>  5   |  0   |  0   |  0   |
+|******|******|******|******|
 ```
 
-The asynchronous Response with ID = **5** (SDSIO_CMD_FLAGS) contains the flags update information from the Host computer.
-This Response can arrive at any time when the Host wants to update the flags value.
-It can also precede a Response to any other command (e.g., SDSIO_CMD_OPEN or SDSIO_CMD_READ), but it cannot be sent by the Host
-while a Response to another Command is in progress.
-`Flags Set` is a request to set flags.
-`Flags Clear` is a request to clear flags.
+The Response with ID = **5** (SDSIO_CMD_PING) returns the Status with nonzero = server active, else 0
 
 ```txt
-| WORD | WORD      | WORD        | WORD |
-<  5   | Flags Set | Flags Clear |  0   |
-|******|***********|*************|******|
+| WORD | WORD |  WORD  | WORD |
+<  5   |  0   | Status |  0   |
+|******|******|********|******|
+```
+
+
+**SDSIO_CMD_FLAGS**
+
+The asynchronous Response with ID = **6** (SDSIO_CMD_FLAGS) contains the SDS control flags update information from the Host.
+This Response can arrive at any time when the Host wants to update the SDS control flags.
+It can also precede a Response to any other command (e.g., SDSIO_CMD_OPEN or SDSIO_CMD_READ), but it cannot be sent by the Host
+while a Response to another Command is in progress.
+`Set Mask` bits to set in sdsFlags.
+`Clear Mask` bits to clear in sdsFlags.
+
+```txt
+| WORD | WORD     | WORD       | WORD |
+<  6   | Set Mask | Clear Mask |  0   |
+|******|**********|************|******|
 ```
 
 **SDSIO_CMD_INFO**
 
-The Command with ID = **6** (SDSIO_CMD_INFO) sends control information (e.g., error information) to the Host computer.
-`Len` specifies the size of the `Data` that follows the header.
+The Command with ID = **7** (SDSIO_CMD_INFO) sends control information (sdsFlags, idleRate and error information) to the Host.
+`sdsFlags` is the current value of the sdsFlags global variable.
+`idleRate` is the current value of the idleRate global variable.
+`Error Len` specifies the size of the `Error Data` that follows the header containing error information from sdsError global structure.
 There is no Response from the SDSIO Server to this Command.
 
 ```txt
-| WORD | WORD | WORD | WORD |++++++|
->  6   |  0   |  0   | Len  | Data |
-|******|******|******|******|++++++|
+| WORD | WORD     | WORD     | WORD      |++++++++++++|
+>  7   | sdsFlags | idleRate | Error Len | Error Data |
+|******|**********|**********|***********|++++++++++++|
 ```
 
 ## SDSIO Message Sequence

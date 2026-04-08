@@ -29,23 +29,6 @@
 // SDSIO Client works in a pair with SDSIO Server. Communication protocol is documented in the following link:
 // https://arm-software.github.io/SDS-Framework/main/theory/#sdsio-server-protocol
 
- // SDSIO header
-typedef struct {
-  uint32_t command;
-  uint32_t sdsio_id;
-  uint32_t argument;
-  uint32_t data_size;
-} sdsio_header_t;
-
-// SDSIO Server Command IDs
-#define SDSIO_CMD_OPEN          1U
-#define SDSIO_CMD_CLOSE         2U
-#define SDSIO_CMD_WRITE         3U
-#define SDSIO_CMD_READ          4U
-#define SDSIO_CMD_PING          5U
-#define SDSIO_CMD_FLAGS         6U
-#define SDSIO_CMD_INFO          7U
-
 // Function prototypes
 
 /**
@@ -85,13 +68,21 @@ int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size);
 int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
 
 /**
-  \fn          uint32_t sdsioClientReceiveNonBlocking (uint8_t *buf, uint32_t buf_size)
-  \brief       Receive data from SDSIO-Server (non-blocking).
+  \fn          int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size)
+  \brief       Start receiving data from SDSIO-Server (non-blocking).
   \param[out]  buf          pointer to the buffer where received data will be stored
   \param[in]   buf_size     buffer size in bytes
-  \return      number of bytes successfully received
+  \return      SDSIO_OK on success or
+               a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-uint32_t sdsioClientReceiveNonBlocking (uint8_t *buf, uint32_t buf_size);
+int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size);
+
+/**
+  \fn          uint32_t sdsioClientReceiveGetCount (void)
+  \brief       Performs a non-blocking check of how many bytes were received from SDSIO-Server.
+  \return      number of bytes received
+*/
+uint32_t sdsioClientReceiveGetCount (void);
 
 #ifdef  __cplusplus
 }

@@ -25,6 +25,23 @@
 #include "sdsio.h"
 #include "sdsio_client.h"
 
+ // SDSIO header
+typedef struct {
+  uint32_t command;
+  uint32_t sdsio_id;
+  uint32_t argument;
+  uint32_t data_size;
+} sdsio_header_t;
+
+// SDSIO Server Command IDs
+#define SDSIO_CMD_OPEN          1U
+#define SDSIO_CMD_CLOSE         2U
+#define SDSIO_CMD_WRITE         3U
+#define SDSIO_CMD_READ          4U
+#define SDSIO_CMD_PING          5U
+#define SDSIO_CMD_FLAGS         6U
+#define SDSIO_CMD_INFO          7U
+
 static uint8_t sdsio_client_initialized = 0U;
 
 // Ping Server retries
