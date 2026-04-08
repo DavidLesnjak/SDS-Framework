@@ -139,7 +139,6 @@ typedef struct {
   const char *file;                     // File name where error occurred
   uint32_t line;                        // Line number where error occurred
   uint8_t occurred;                     // Flag indicating that an error has occurred
-  uint8_t reported;                     // Flag indicating that an error was reported to the Host
 } sdsError_t;
 
 // Global error information
@@ -188,12 +187,14 @@ extern volatile uint32_t sdsFlags;      // SDS control flags (see \ref SDS_Flags
 // Global state information
 extern volatile uint32_t sdsState;      // SDS states (see \ref SDS_States)
 
+// Global idle rate information
+extern volatile uint32_t sdsIdleRate;
+
 /**
-  \fn          void sdsQuery (void)
-  \brief       Wait for the Host to become ready and update sdsFlags value according to
-               information received from the Host.
+  \fn          void sdsExchange (void)
+  \brief       Exchange information with Host (sdsFlags, sdsIdleRate, error message)
 */
-void sdsQuery (void);
+void sdsExchange (void);
 
 /**
   \fn          int32_t sdsFlagsModify (uint32_t flags_set, uint32_t flags_clr)
@@ -204,17 +205,6 @@ void sdsQuery (void);
                a negative value on error (see \ref SDS_Return_Codes)
 */
 int32_t sdsFlagsModify (uint32_t flags_set, uint32_t flags_clr);
-
-/**
-  \fn          int32_t sdsInfoSend (uint32_t idle_rate, uint8_t *error_info, uint32_t error_len)
-  \brief       Send additional information (sdsFlags, idle rate, error status) to the Host.
-  \param[in]   idle_rate      idle rate value
-  \param[in]   error_info     pointer to error information (see \ref sdsError_t) to be sent
-  \param[in]   error_len      number of bytes of error information to send
-  \return      SDS_OK on success or
-               a negative value on error (see \ref SDS_Return_Codes)
-*/
-int32_t sdsInfoSend (uint32_t idle_rate, uint8_t *error_info, uint32_t error_len);
 
 #ifdef  __cplusplus
 }
