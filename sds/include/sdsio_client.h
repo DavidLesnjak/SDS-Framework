@@ -20,7 +20,7 @@
 #define SDSIO_CLIENT_H
 
 #ifdef  __cplusplus
- extern "C"
+extern "C"
 {
 #endif
 
@@ -79,7 +79,7 @@ int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size);
 
 /**
   \fn          uint32_t sdsioClientReceiveGetCount (void)
-  \brief       Performs a non-blocking check of how many bytes were received from SDSIO-Server.
+  \brief       Perform a non-blocking check of how many bytes were received from SDSIO-Server.
   \return      number of bytes received
 */
 uint32_t sdsioClientReceiveGetCount (void);
