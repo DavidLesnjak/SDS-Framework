@@ -189,13 +189,13 @@ extern volatile uint32_t sdsFlags;      // SDS control flags (see \ref SDS_Flags
 extern volatile uint32_t sdsState;      // SDS states (see \ref SDS_States)
 
 // Global idle rate information
-extern volatile uint32_t idleRate;
+extern volatile uint32_t sdsIdleRate;
 
 /**
   \fn          int32_t sdsExchange (void)
   \brief       Exchange information with the Host.
                Update sdsFlags if requested by the Host, and send current sdsFlags
-               value along with idleRate and optional error information (sdsError) to the Host.
+               value along with sdsIdleRate and optional error information (sdsError) to the Host.
   \return      SDS_OK on success or
                a negative value on error (see \ref SDS_Return_Codes)
 */
