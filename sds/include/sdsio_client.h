@@ -69,7 +69,7 @@ int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
 
 /**
   \fn          int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size)
-  \brief       Start receiving data from SDSIO-Server (non-blocking).
+  \brief       Start a non-blocking receive operation to retrieve data from the SDSIO-Server.
   \param[out]  buf          pointer to the buffer where received data will be stored
   \param[in]   buf_size     buffer size in bytes
   \return      SDSIO_OK on success or
@@ -78,8 +78,16 @@ int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
 int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size);
 
 /**
+  \fn          int32_t sdsioClientReceiveAbort (void)
+  \brief       Abort an ongoing non-blocking receive operation.
+  \return      SDSIO_OK on success or
+               a negative value on error (see \ref SDS_IO_Return_Codes)
+*/
+int32_t sdsioClientReceiveAbort (void);
+
+/**
   \fn          uint32_t sdsioClientReceiveGetCount (void)
-  \brief       Perform a non-blocking check of how many bytes were received from SDSIO-Server.
+  \brief       Return the number of bytes received since the last non-blocking receive operation was started.
   \return      number of bytes received
 */
 uint32_t sdsioClientReceiveGetCount (void);

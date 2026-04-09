@@ -101,16 +101,6 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size);
 */
 int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size);
 
-/**
-  \fn          int32_t sdsioExchange (void)
-  \brief       Exchange information with the Host.
-               Update sdsFlags if requested by the Host, and send current sdsFlags
-               value along with idleRate and optional error information (sdsError) to the Host.
-  \return      SDSIO_OK on success or
-               a negative value on error (see \ref SDS_IO_Return_Codes)
-*/
-int32_t sdsioExchange (void);
-
 #ifdef  __cplusplus
 }
 #endif
