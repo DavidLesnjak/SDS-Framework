@@ -194,17 +194,8 @@ int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
 }
 
 /**
-  Write control data to Host.
+  This function cannot be implemented in system using SDS I/O interface via file system.
 */
-int32_t sdsioControlWrite (const void *buf, uint32_t buf_size) {
-  // This command is not supported on local file system.
-  return SDSIO_ERROR_INTERFACE;
-}
-
-/**
-  Read control data from Host.
-*/
-int32_t sdsioControlRead (void *buf, uint32_t buf_size) {
-  // This command is not supported on local file system.
-  return SDSIO_ERROR_INTERFACE;
+int32_t sdsExchange (void) {
+  return SDSIO_ERROR;
 }

@@ -372,7 +372,7 @@ operations related to the previous stream have been fully completed or canceled.
 \details The following values are passed as event value to the \ref sdsEvent_t callback function.
 @{
 \def SDS_EVENT_ERROR_IO
-\brief Event triggered when an SDSI I/O error occurs.
+\brief Event triggered when an SDS I/O error occurs.
 
 \def SDS_EVENT_NO_SPACE
 \brief Event triggered when \ref sdsWrite fails due to insufficient space in the SDS circular buffer.
@@ -388,13 +388,12 @@ operations related to the previous stream have been fully completed or canceled.
 \details
 This *pointer* defines the handle to an SDS stream. It is used to identify a data stream across the different functions for
 the SDS system.
+*/
 
 /**
 \typedef sdsMode_t
 \details
 This *enum* identifies the opening mode of an SDS stream: read or write.
-*/
-
 */
 
 /**
@@ -529,7 +528,7 @@ data is available, the function returns \ref SDS_EOS.
 \details
 Exchanges SDS control information with the Host.
 Updates `sdsFlags` control flags if requested by the Host, and sends current (updated) control flags
-value along with `idleRate` and optional error information (`sdsError`) to the Host.
+value along with `sdsIdleRate` and optional error information (`sdsError`) to the Host.
 */
 
 /**

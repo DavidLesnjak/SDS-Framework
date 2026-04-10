@@ -26,6 +26,12 @@ extern "C"
 
 #include <stdint.h>
 
+// Receive mode
+typedef enum {
+  sdsioReceiveBlocking    = 0U,         // Receive in blocking mode
+  sdsioReceiveNonBlocking = 1U          // Receive in non-blocking mode
+} sdsioReceiveMode_t;
+
 // SDSIO Client works in a pair with SDSIO Server. Communication protocol is documented in the following link:
 // https://arm-software.github.io/SDS-Framework/main/theory/#sdsio-server-protocol
 
@@ -58,39 +64,15 @@ int32_t sdsioClientUninit (void);
 int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size);
 
 /**
-  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size)
-  \brief       Receive data from SDSIO-Server (blocking).
+  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode)
+  \brief       Receive data from SDSIO-Server in blocking or non-blocking mode.
   \param[out]  buf          pointer to the buffer where received data will be stored
   \param[in]   buf_size     buffer size in bytes
+  \param[in]   mode         blocking or non-blocking mode (see \ref sdsioReceiveMode_t)
   \return      number of bytes successfully received or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size);
-
-/**
-  \fn          int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size)
-  \brief       Start a non-blocking receive operation to retrieve data from the SDSIO-Server.
-  \param[out]  buf          pointer to the buffer where received data will be stored
-  \param[in]   buf_size     buffer size in bytes
-  \return      SDSIO_OK on success or
-               a negative value on error (see \ref SDS_IO_Return_Codes)
-*/
-int32_t sdsioClientReceiveStart (uint8_t *buf, uint32_t buf_size);
-
-/**
-  \fn          int32_t sdsioClientReceiveAbort (void)
-  \brief       Abort an ongoing non-blocking receive operation.
-  \return      SDSIO_OK on success or
-               a negative value on error (see \ref SDS_IO_Return_Codes)
-*/
-int32_t sdsioClientReceiveAbort (void);
-
-/**
-  \fn          uint32_t sdsioClientReceiveGetCount (void)
-  \brief       Return the number of bytes received since the last non-blocking receive operation was started.
-  \return      number of bytes received
-*/
-uint32_t sdsioClientReceiveGetCount (void);
+int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode);
 
 #ifdef  __cplusplus
 }

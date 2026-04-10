@@ -82,15 +82,15 @@ static inline int32_t sdsioLock (void) {
   }
 
 }
-static inline int32_t sdsioUnLock (void) {
+static inline int32_t sdsioUnlock (void) {
   osMutexRelease(lock_id);
   return SDSIO_OK;
 }
 #else
-static inline void sdsioLockCreate (void) { return SDSIO_OK;}
-static inline void sdsioLockDelete (void) { return SDSIO_OK;}
-static inline void sdsioLock       (void) { return SDSIO_OK;}
-static inline void sdsioUnLock     (void) { return SDSIO_OK;}
+static inline int32_t sdsioLockCreate (void) { return SDSIO_OK; }
+static inline int32_t sdsioLockDelete (void) { return SDSIO_OK; }
+static inline int32_t sdsioLock       (void) { return SDSIO_OK; }
+static inline int32_t sdsioUnlock     (void) { return SDSIO_OK; }
 #endif
 
 // Internal helper functions
@@ -110,8 +110,8 @@ static inline void sdsioUnLock     (void) { return SDSIO_OK;}
     data:   no data
 */
 static int32_t PingServer (void) {
-  int32_t  ret = SDSIO_ERROR;
-  header_t header;
+  int32_t        ret = SDSIO_ERROR;
+  sdsio_header_t header;
 
   header.command   = SDSIO_CMD_PING;
   header.sdsio_id  = 0U;
@@ -119,11 +119,11 @@ static int32_t PingServer (void) {
   header.data_size = 0U;
 
   // Send Header
-  ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-  if (ret == sizeof(header_t)) {
+  ret = sdsioClientSend((const uint8_t *)&header, sizeof(header));
+  if (ret == sizeof(header)) {
     // Receive header.
-    ret = sdsioClientReceive((uint8_t *)&header, sizeof(header_t));
-    if (ret == sizeof(header_t)) {
+    ret = sdsioClientReceive((uint8_t *)&header, sizeof(header), sdsioReceiveBlocking);
+    if (ret == sizeof(header)) {
       if ((header.command   == SDSIO_CMD_PING) &&
           (header.argument  != 0U)  &&
           (header.data_size == 0U)) {
@@ -218,8 +218,8 @@ int32_t sdsioUninit (void) {
 sdsioId_t sdsioOpen (const char *name, sdsioMode_t mode) {
   uint32_t sdsio_id = 0U;
   int32_t  ret = SDSIO_ERROR;
-  uint32_t data_size;
-  header_t header;
+  uint32_t       data_size;
+  sdsio_header_t header;
 
   if (sdsio_client_initialized == 0U) {
     // SDS I/O Client not initialized.
@@ -235,15 +235,15 @@ sdsioId_t sdsioOpen (const char *name, sdsioMode_t mode) {
       header.data_size = data_size;
 
       // Send header.
-      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-      if (ret == sizeof(header_t)) {
+      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header));
+      if (ret == sizeof(header)) {
         // Send data.
         ret = sdsioClientSend((const uint8_t *)name, data_size);
       }
       // Receive header.
       if (ret == data_size) {
-        ret = sdsioClientReceive((uint8_t *)&header, sizeof(header_t));
-        if (ret == sizeof(header_t)) {
+        ret = sdsioClientReceive((uint8_t *)&header, sizeof(header), sdsioReceiveBlocking);
+        if (ret == sizeof(header)) {
           if ((header.command   == SDSIO_CMD_OPEN) &&
               (header.argument  == mode)           &&
               (header.data_size == 0U)) {
@@ -252,7 +252,7 @@ sdsioId_t sdsioOpen (const char *name, sdsioMode_t mode) {
         }
       }
 
-      sdsioUnLock();
+      sdsioUnlock();
     }
   }
 
@@ -269,8 +269,8 @@ sdsioId_t sdsioOpen (const char *name, sdsioMode_t mode) {
     data:   no data
 */
 int32_t sdsioClose (sdsioId_t id) {
-  int32_t  ret = SDSIO_ERROR;
-  header_t header;
+  int32_t        ret = SDSIO_ERROR;
+  sdsio_header_t header;
 
   if (sdsio_client_initialized == 0U) {
     // SDS I/O Client not initialized.
@@ -286,14 +286,14 @@ int32_t sdsioClose (sdsioId_t id) {
       header.data_size = 0U;
 
       // Send Header.
-      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-      if (ret == sizeof(header_t)) {
+      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header));
+      if (ret == sizeof(header)) {
         ret = SDSIO_OK;
       } else if (ret >= 0) {
         // Incomplete header sent.
         ret = SDSIO_ERROR_INTERFACE;
       }
-      sdsioUnLock();
+      sdsioUnlock();
     }
   } else {
     // Invalid parameter.
@@ -313,8 +313,8 @@ int32_t sdsioClose (sdsioId_t id) {
     data:   data to be written
 */
 int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size) {
-  int32_t  ret = SDSIO_ERROR;
-  header_t header;
+  int32_t        ret = SDSIO_ERROR;
+  sdsio_header_t header;
 
   if (sdsio_client_initialized == 0U) {
     // SDS I/O Client not initialized.
@@ -330,8 +330,8 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size) {
       header.data_size = buf_size;
 
       // Send header.
-      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-      if (ret == sizeof(header_t)) {
+      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header));
+      if (ret == sizeof(header)) {
         // Send data.
         ret = sdsioClientSend((const uint8_t *)buf, buf_size);
         if ((ret >= 0) && (ret < buf_size)) {
@@ -342,7 +342,7 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size) {
         // Incomplete header sent.
         ret = SDSIO_ERROR_INTERFACE;
       }
-      sdsioUnLock();
+      sdsioUnlock();
     }
   } else {
     // Invalid parameter.
@@ -368,9 +368,9 @@ int32_t sdsioWrite (sdsioId_t id, const void *buf, uint32_t buf_size) {
     data    data read
 */
 int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
-  int32_t  ret = SDSIO_ERROR;
-  uint32_t size;
-  header_t header;
+  int32_t        ret = SDSIO_ERROR;
+  uint32_t       size;
+  sdsio_header_t header;
 
   if (sdsio_client_initialized == 0U) {
     // SDS I/O Client not initialized.
@@ -386,12 +386,12 @@ int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
       header.data_size = 0U;
 
       // Send header.
-      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-      if (ret == sizeof(header_t)) {
+      ret = sdsioClientSend((const uint8_t *)&header, sizeof(header));
+      if (ret == sizeof(header)) {
         // Receive header
-        ret = sdsioClientReceive((uint8_t *)&header, sizeof(header_t));
+        ret = sdsioClientReceive((uint8_t *)&header, sizeof(header), sdsioReceiveBlocking);
         // Check if full header is received.
-        if (ret == sizeof(header_t)) {
+        if (ret == sizeof(header)) {
           // Check if header is valid.
           if ((header.command == SDSIO_CMD_READ) && (header.sdsio_id == (uint32_t)id)) {
             if (header.data_size == 0) {
@@ -409,7 +409,7 @@ int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
                 size = buf_size;
               }
               // Read data.
-              ret = sdsioClientReceive((uint8_t *)buf, size);
+              ret = sdsioClientReceive((uint8_t *)buf, size, sdsioReceiveBlocking);
             }
           } else {
             // Invalid header received.
@@ -423,7 +423,7 @@ int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
         // Incomplete header sent.
         ret = SDSIO_ERROR_INTERFACE;
       }
-      sdsioUnLock();
+      sdsioUnlock();
     }
   } else {
     // Invalid parameter.
@@ -434,126 +434,24 @@ int32_t sdsioRead (sdsioId_t id, void *buf, uint32_t buf_size) {
 }
 
 /**
-  Write control data to Host.
-  Send:
-    header: command   = SDSIO_CMD_CTRL_WRITE
-            sdsio_id  = not used
-            argument  = not used
-            data_size = number of data bytes to write
-    data:   data to be written
-*/
-int32_t sdsioControlWrite (const void *buf, uint32_t buf_size) {
-  int32_t  ret = SDSIO_ERROR;
-  header_t header;
-
-  if (sdsio_client_initialized == 0U) {
-    // SDS I/O Client not initialized.
-    return SDSIO_ERROR;
-  }
-
-  // buf pointer must not be NULL and buf_size must not be 0
-  if ((buf == NULL) || (buf_size == 0U)) {
-    // Invalid parameter.
-    return SDSIO_ERROR_PARAMETER;
-  }
-
-  ret = sdsioLock();
-  if (ret == SDSIO_OK) {
-    header.command   = SDSIO_CMD_CTRL_WRITE;
-    header.sdsio_id  = 0U;
-    header.argument  = 0U;
-    header.data_size = buf_size;
-
-    // Send header.
-    ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-    // Check if full header was received.
-    if (ret == sizeof(header_t)) {
-      // Send data.
-      ret = sdsioClientSend((const uint8_t *)buf, buf_size);
-      if ((ret >= 0) && (ret < buf_size)) {
-        // Incomplete data sent.
-        ret = SDSIO_ERROR_INTERFACE;
-      }
-    } else if (ret >= 0) {
-      // Incomplete header sent.
-      ret = SDSIO_ERROR_INTERFACE;
-    }
-    sdsioUnLock();
-  }
-
-  return ret;
-}
-
-/**
-  Read control data from Host.
-  Send:
-    header: command   = SDSIO_CMD_CTRL_READ
-            sdsio_id  = not used
-            argument  = maximum number of bytes to read
+  Check whether asynchronous SDSIO_CMD_FLAGS information has been received
+  from the host, and update sdsFlags accordingly.
+  Read:
+    header: command   = SDSIO_CMD_FLAGS
+            sdsio_id  = set mask
+            argument  = clear mask
             data_size = 0
-    data:   no data
-  Receive:
-    header: command   = SDSIO_CMD_CTRL_READ
-            sdsio_id  = not used
-            argument  = not used
-            data_size = number of data bytes read
-    data    data read
+
+  Send the current sdsFlags value, along with sdsIdleRate and any optional
+  error information (sdsError), to the host.
+  Send:
+    header: command   = SDSIO_CMD_INFO
+            sdsio_id  = sdsFlags
+            argument  = sdsIdleRate
+            data_size = number of error data bytes to send
+    data:   error data to be sent
 */
-int32_t sdsioControlRead (void *buf, uint32_t buf_size) {
-  int32_t  ret = SDSIO_ERROR;
-  uint32_t size;
-  header_t header;
-
-  if (sdsio_client_initialized == 0U) {
-    // SDS I/O Client not initialized.
-    return SDSIO_ERROR;
-  }
-
-  // buf pointer must not be NULL and buf_size must not be 0
-  if ((buf == NULL) || (buf_size == 0U)) {
-    // Invalid parameter.
-    return SDSIO_ERROR_PARAMETER;
-  }
-
-  ret = sdsioLock();
-  if (ret == SDSIO_OK) {
-    header.command   = SDSIO_CMD_CTRL_READ;
-    header.sdsio_id  = 0U;
-    header.argument  = buf_size;
-    header.data_size = 0U;
-
-    // Send header.
-    ret = sdsioClientSend((const uint8_t *)&header, sizeof(header_t));
-    if (ret == sizeof(header_t)) {
-      // Receive header.
-      ret = sdsioClientReceive((uint8_t *)&header, sizeof(header_t));
-      // Check if full header is received.
-      if (ret == sizeof(header_t)) {
-        // Check if header is valid.
-        if ((header.command  == SDSIO_CMD_CTRL_READ) &&
-            (header.sdsio_id == 0U) && 
-            (header.argument == 0U)) {
-          if (header.data_size < buf_size) {
-            size = header.data_size;
-          } else {
-            size = buf_size;
-          }
-          // Read data.
-          ret = sdsioClientReceive((uint8_t *)buf, size);
-        } else {
-          // Invalid header received.
-          ret = SDSIO_ERROR_INTERFACE;
-        }
-      } else if (ret >= 0) {
-        // Incomplete header received.
-        ret = SDSIO_ERROR_INTERFACE;
-      }
-    } else {
-      // Incomplete header sent.
-      ret = SDSIO_ERROR_INTERFACE;
-    }
-    sdsioUnLock();
-  }
-
-  return ret;
+int32_t sdsExchange (void) {
+  // Not implemented yet
+  return SDSIO_ERROR;
 }

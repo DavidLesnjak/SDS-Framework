@@ -50,7 +50,7 @@ int32_t sdsioClientUninit (void) {
 
 /**
   \fn          int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size)
-  \brief       Send data to SDSIO-Server.
+  \brief       Send data to SDSIO-Server (blocking).
   \param[in]   buf         pointer to buffer with data to send
   \param[in]   buf_size    buffer size in bytes
   \return      number of bytes successfully sent or
@@ -59,51 +59,24 @@ int32_t sdsioClientUninit (void) {
 int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size) {
   int32_t ret = SDSIO_ERROR;
 
-  // int32_t status;
-
-  // ToDo: Modify code below to send data in buf to SDSIO-Server
-  // status = CustomSend(buf, buf_size);
-  // if (status == TIMEOUT) {
-  //   // Timeout happened.
-  //   ret = SDSIO_ERROR_TIMEOUT;
-  // } else if (status == ERROR) {
-  //   // Error happened.
-  //   ret = SDSIO_ERROR_INTEFACE;
-  // } else {
-  //   // Data sent successfully.
-  //   // Return num of bytes sent.
-  //   ret = status;
-  // }
+  // ToDo: Add code for sending data in buf to SDSIO-Server in blocking mode
 
   return ret;
 }
 
 /**
-  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size)
-  \brief       Receive data from SDSIO-Server.
-  \param[out]  buf          pointer to buffer for data to read
+  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode)
+  \brief       Receive data from SDSIO-Server in blocking or non-blocking mode.
+  \param[out]  buf          pointer to the buffer where received data will be stored
   \param[in]   buf_size     buffer size in bytes
+  \param[in]   mode         blocking or non-blocking mode (see \ref sdsioReceiveMode_t)
   \return      number of bytes successfully received or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size) {
+int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode) {
   int32_t ret = SDSIO_ERROR;
 
-  // int32_t status;
-
-  // ToDo: Modify code below to receive data from SDSIO-Server
-  // status = CustomReceive(buf, buf_size);
-  // if (status == TIMEOUT) {
-  //   // Timeout happened.
-  //   ret = SDSIO_ERROR_TIMEOUT;
-  // } else if (status == ERROR) {
-  //   // Error happened.
-  //   ret = SDSIO_ERROR_INTEFACE;
-  // } else {
-  //   // Data  received successfully.
-  //   // Return num of bytes received.
-  //   ret = status;
-  // }
+  // ToDo: Add code for receiveing data to buf from SDSIO-Server in blocking or non-blocking mode
 
   return ret;
 }

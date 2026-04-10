@@ -16,7 +16,7 @@
     <release version="3.0.0-dev">
       Active development ...
       SDS-Framework:
-      - Added support for control data exchange between the Device and Host, as well as between the SDSIO-Client and SDSIO-Server
+      - Simplified API
       SDSIO-Client:
       - Improved handling of initialization failure caused by ping timeout, preventing misleading "Ping received." SDSIO-Server message
       - Fixed compilation errors for serial interface
@@ -53,8 +53,8 @@
       <description>SDS IO via File System (Semihosting)</description>
       <require Cclass="CMSIS-View" Cgroup="Event Recorder" Cvariant="Semihosting"/>
     </condition>
-    <condition id="SDS Recorder and Player with CMSIS-RTOS2">
-      <description>SDS Recorder and Player with CMSIS-RTOS2</description>
+    <condition id="SDS with CMSIS-RTOS2">
+      <description>SDS with CMSIS-RTOS2</description>
       <require Cclass="CMSIS" Cgroup="RTOS2"/>
       <require Cclass="SDS"   Cgroup="Buffer"/>
       <require Cclass="SDS"   Cgroup="IO"/>
@@ -197,17 +197,17 @@
       </files>
     </component>
 
-    <!-- SDS Recorder and Player -->
-    <component Cclass="SDS" Cgroup="RecPlay" Cvariant="CMSIS-RTOS2" Cversion="3.0.0" condition="SDS Recorder and Player with CMSIS-RTOS2">
-      <description>Recorder/Player interface for data stream</description>
+    <!-- SDS -->
+    <component Cclass="SDS" Cgroup="Stream" Cvariant="CMSIS-RTOS2" Cversion="3.0.0" condition="SDS with CMSIS-RTOS2">
+      <description>SDS interface for data streams</description>
       <RTE_Components_h>
-        #define RTE_SDS_REC_PLAY                        /* Synchronous Data Stream Recorder and Player */
+        #define RTE_SDS                                 /* Synchronous Data Stream */
       </RTE_Components_h>
       <files>
-        <file category="header" name="sds/include/sds_rec_play.h"/>
-        <file category="source" name="sds/source/sds_rec_play.c"/>
-        <file category="header" name="sds/config/sds_rec_play_config.h" attr="config" version="2.0.0"/>
-        <file category="doc"    name="docs/SDS_API/group__SDS__Recorder__Player.html"/>
+        <file category="header" name="sds/include/sds.h"/>
+        <file category="source" name="sds/source/sds.c"/>
+        <file category="header" name="sds/config/sds_config.h" attr="config" version="3.0.0"/>
+        <file category="doc"    name="docs/SDS_API/group__SDS__Interface.html"/>
       </files>
     </component>
   </components>

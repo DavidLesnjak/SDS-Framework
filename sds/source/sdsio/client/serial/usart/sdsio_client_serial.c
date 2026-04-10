@@ -111,7 +111,7 @@ int32_t sdsioClientUninit (void) {
 
 /**
   \fn          int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size)
-  \brief       Send data to SDSIO-Server.
+  \brief       Send data to SDSIO-Server (blocking).
   \param[in]   buf         pointer to buffer with data to send
   \param[in]   buf_size    buffer size in bytes
   \return      number of bytes successfully sent or
@@ -144,16 +144,22 @@ int32_t sdsioClientSend (const uint8_t *buf, uint32_t buf_size) {
 }
 
 /**
-  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size)
-  \brief       Receive data from SDSIO-Server.
-  \param[out]  buf          pointer to buffer for data to read
+  \fn          int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode)
+  \brief       Receive data from SDSIO-Server in blocking or non-blocking mode.
+  \param[out]  buf          pointer to the buffer where received data will be stored
   \param[in]   buf_size     buffer size in bytes
+  \param[in]   mode         blocking or non-blocking mode (see \ref sdsioReceiveMode_t)
   \return      number of bytes successfully received or
                a negative value on error (see \ref SDS_IO_Return_Codes)
 */
-int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size) {
+int32_t sdsioClientReceive (uint8_t *buf, uint32_t buf_size, sdsioReceiveMode_t mode) {
   int32_t ret = SDSIO_ERROR;
   int32_t event_status;
+
+  if (mode == sdsioReceiveNonBlocking) {
+    // Not supported yet
+    return SDSIO_ERROR;
+  }
 
   if (pDrvUSART->Receive(buf, buf_size) == ARM_DRIVER_OK) {
     event_status = osEventFlagsWait(sdsioEventFlagId,
