@@ -242,6 +242,7 @@ class sdsControlUI(threading.Thread):
     def get_flags_set(self):
         with self._lock:
             flags_set = self._sdsControlFlagsSet
+            flags_set |= (1 << 28)  # Always set Alive bit
             self._sdsControlFlagsSet = 0
             return flags_set
 
@@ -626,6 +627,15 @@ class sdsio_manager:
             return self.get_async_flags()
         return None
 
+    def get_shutdown_flags(self):
+        resp = bytearray()
+        cmd = 6
+        resp.extend(cmd.to_bytes(4,'little'))
+        resp.extend((0).to_bytes(4,'little'))
+        resp.extend((1 << 28).to_bytes(4,'little'))
+        resp.extend((0).to_bytes(4,'little'))
+        return resp
+
     def execute_request(self, buf: bytes):
         cmd = int.from_bytes(buf[0:4],'little')
         if cmd in (1, 2, 3, 4, 5):
@@ -712,6 +722,12 @@ class async_sdsio_server_socket:
                 printer.info(f"SDSIO Client disconnected.")
         finally:
             self._handler_tasks.discard(task)
+            # Send shutdown flags (clear alive bit) before closing
+            try:
+                writer.write(self.manager.get_shutdown_flags())
+                await writer.drain()
+            except Exception:
+                pass
             await self._safe_close(reader, writer)
             # Clean up any streams
             self.manager.clean()
@@ -870,6 +886,11 @@ class sdsio_server_serial:
                     if response:
                         self.write(response)
         finally:
+            # Send shutdown flags (clear alive bit) before closing
+            try:
+                self.write(self.manager.get_shutdown_flags())
+            except Exception:
+                pass
             # Clean up all SDS streams on disconnect/error
             self.manager.clean()
             self.ser.close()
@@ -1240,10 +1261,20 @@ class sdsio_server_usb:
             try:
                 await asyncio.gather(self._consumer(), self._out_sender())
             except asyncio.CancelledError:
-                # Ctrl+C: clean up and exit the reconnect loop
+                # Send shutdown flags (clear alive bit) before cleanup
+                try:
+                    self.handle.bulkWrite(self.out_ep, self.mgr.get_shutdown_flags(), timeout=1000)
+                except Exception:
+                    pass
                 self.mgr.clean()
                 self.close()
                 raise
+
+            # Send shutdown flags (clear alive bit) before cleanup
+            try:
+                self.handle.bulkWrite(self.out_ep, self.mgr.get_shutdown_flags(), timeout=1000)
+            except Exception:
+                pass
 
             # clean up this connection
             protocol_err = self._protocol_error
