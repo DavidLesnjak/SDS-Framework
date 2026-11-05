@@ -33,12 +33,12 @@ To access [SDS data files](theory.md#sds-data-files), configure the `*.sdsio.yml
 ```bash
 >python sdsio-server.py -c myproject.sdsio.yml
 SDSIO-Server 3.1.0
-Press 'Ctrl+C' or 'X' to exit.
+Press 'Ctrl+C' or 'X' to exit
 Working directory: ...\SDS_data
 SDSIO configuration YAML: ...\myproject.sdsio.yml
-SDSIO command input: R=Record, P=playback, S/s=stop, T/t=reset, Q/q=query flags, X/x=exit, A-H=set flags 0-7, a-h=clear flags 0-7.
+SDSIO command input: R=Record, P=playback, S/s=stop, T/t=reset, Q/q=query flags, X/x=exit, A-H=set flags 0-7, a-h=clear flags 0-7
 SDSIO-Server waiting for USB SDSIO-Client...
-SDSIO-Client USB device connected.
+SDSIO-Client USB device connected
 ```
 
 ## Layer: sdsio_network
@@ -61,10 +61,10 @@ To access [SDS data files](theory.md#sds-data-files), configure the `*.sdsio.yml
 ```bash
 >python sdsio-server.py -c myproject.sdsio.yml
 SDSIO-Server 3.1.0
-Press 'Ctrl+C' or 'X' to exit.
+Press 'Ctrl+C' or 'X' to exit
 Working directory: ...\SDS_data
 SDSIO configuration YAML: ...\myproject.sdsio.yml
-SDSIO command input: R=Record, P=playback, S/s=stop, T/t=reset, Q/q=query flags, X/x=exit, A-H=set flags 0-7, a-h=clear flags 0-7.
+SDSIO command input: R=Record, P=playback, S/s=stop, T/t=reset, Q/q=query flags, X/x=exit, A-H=set flags 0-7, a-h=clear flags 0-7
 SDSIO-Server listening on 192.0.2.10:5050...
 ```
 
